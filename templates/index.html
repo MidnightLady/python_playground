@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Code Problems</title>
+
+      <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <style>
+        .folder {
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .file {
+            padding-left: 20px;
+        }
+        .nested {
+            display: none;
+            padding-left: 20px;
+        }
+        .active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Python Code Problems</h1>
+
+        <div class="list-group">
+            {% for item in items %}
+                {% if item.type == 'folder' %}
+                    <a href="javascript:void(0);" onclick="toggleVisibility('{{ item.path }}')" class="list-group-item list-group-item-action folder">
+                        {{ item.name }}
+                    </a>
+                    <div id="{{ item.path }}" class="nested active">
+                        <!-- Folders and files inside this folder will be listed here -->
+                        {% for sub_item in items %}
+                            {% if sub_item.path.startswith(item.path) and sub_item.path != item.path %}
+                                {% if sub_item.type == 'folder' %}
+                                    <a href="javascript:void(0);" onclick="toggleVisibility('{{ sub_item.path }}')" class="list-group-item list-group-item-action folder">
+                                        {{ sub_item.name }}
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('show_item', item_path=sub_item.path) }}" class="list-group-item list-group-item-action file">
+                                        {{ sub_item.name }}
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function toggleVisibility(folderPath) {
+            var element = document.getElementById(folderPath);
+            element.classList.toggle("active");
+        }
+    </script>
+</body>
+</html>
