@@ -4,20 +4,22 @@ import os
 app = Flask(__name__, template_folder="templates", static_folder='static')
 
 # Path to the folder containing Python files
-PROBLEMS_FOLDER = './problems/'
+PROBLEMS_FOLDERS = {'Leetcode':'./Leetcode/','CodeForce': './CodeForce/'}
 
 
 @app.route('/')
 def index():
-    items = []
+    folders = {}
+    for name, folder in PROBLEMS_FOLDERS.items():
+        items = []
+        for root, dirs, files in os.walk(folder):
+            for d in dirs:
+                items.append({'type': 'folder', 'name': d, 'path': os.path.join(root, d)})
+            for file in files:
+                items.append({'type': 'file', 'name': file, 'path': os.path.join(root, file)})
+        folders[name] = items
 
-    for root, dirs, files in os.walk(PROBLEMS_FOLDER):
-        for dir in dirs:
-            items.append({'type': 'folder', 'name': dir, 'path': os.path.join(root, dir)})
-        for file in files:
-            items.append({'type': 'file', 'name': file, 'path': os.path.join(root, file)})
-
-    return render_template('index.html', items=items)
+    return render_template('index.html', folders=folders)
 
 
 @app.route('/item/<path:item_path>')
